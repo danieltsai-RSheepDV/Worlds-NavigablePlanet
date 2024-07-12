@@ -136,7 +136,7 @@ GameObject:
   - component: {fileID: 687451944}
   - component: {fileID: 687451943}
   - component: {fileID: 687451942}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Planet
   m_TagString: Planet
   m_Icon: {fileID: 0}
@@ -590,9 +590,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 428d80e4844ef4b99888adaae38d672a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerHeight: 2
   mouseSensitivityX: 750
   mouseSensitivityY: 500
   walkSpeed: 8
+  jumpForce: 220
+  groundedMask:
+    serializedVersion: 2
+    m_Bits: 256
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
