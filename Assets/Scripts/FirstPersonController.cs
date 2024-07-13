@@ -5,6 +5,22 @@ using UnityEngine.InputSystem;
 
 public class FirstPersonController : MonoBehaviour
 {
+    private bool m_firstPerson = true;
+    public bool firstPerson
+    {
+        get
+        {
+            return m_firstPerson;
+        }
+        set
+        {
+            if (value == m_firstPerson)
+                return;
+            m_firstPerson = value;
+            TogglePlayerView(m_firstPerson);
+        }
+    }
+
     [SerializeField] private float playerHeight = 2f;
 
     public float mouseSensitivityX = 250f;
@@ -12,6 +28,11 @@ public class FirstPersonController : MonoBehaviour
     public float walkSpeed = 8f;
     public float jumpForce = 220f;
     public LayerMask groundedMask;
+
+    [SerializeField] private Vector3 firstPosition = new Vector3(0, 0.4f, 0);
+    [SerializeField] private Vector3 firstRotation = Vector3.zero;
+    [SerializeField] private Vector3 thirdPosition = new Vector3(0, 8f, 0);
+    [SerializeField] private Vector3 thirdRotation = new Vector3(90f, 0, 0);
 
     Transform cameraT;
     float verticalLookRotation;
@@ -34,14 +55,20 @@ public class FirstPersonController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.Rotate(Vector3.up * rotateX * Time.deltaTime * mouseSensitivityX);
-        verticalLookRotation += rotateY * Time.deltaTime * mouseSensitivityY;
-        verticalLookRotation = Mathf.Clamp(verticalLookRotation, -40, 40);
-        cameraT.localEulerAngles = Vector3.left * verticalLookRotation;
+        // camera rotation
+        if (false)
+        {
+            transform.Rotate(Vector3.up * rotateX * Time.deltaTime * mouseSensitivityX);
+            verticalLookRotation += rotateY * Time.deltaTime * mouseSensitivityY;
+            verticalLookRotation = Mathf.Clamp(verticalLookRotation, -40, 40);
+            cameraT.localEulerAngles = Vector3.left * verticalLookRotation;
+        }
 
+        // player movement
         Vector3 targetMoveAmount = moveDir * walkSpeed;
         moveAmount = Vector3.SmoothDamp(moveAmount, targetMoveAmount, ref smoothMoveVelocity, 0.15f);
 
+        // is player touching ground
         grounded = false;
         Ray ray = new Ray(transform.position, -transform.up);
         RaycastHit hit;
@@ -54,6 +81,7 @@ public class FirstPersonController : MonoBehaviour
 
     void FixedUpdate()
     {
+        // player movement
         GetComponent<Rigidbody>().MovePosition(GetComponent<Rigidbody>().position + transform.TransformDirection(moveAmount) * Time.fixedDeltaTime);
     }
 
@@ -81,6 +109,28 @@ public class FirstPersonController : MonoBehaviour
             {
                 GetComponent<Rigidbody>().AddForce(transform.up * jumpForce);
             }
+        }
+    }
+
+    private void OnViewChange(InputValue viewValue)
+    {
+        if (viewValue.Get<float>() > 0)
+            firstPerson = !firstPerson;
+    }
+
+    private void TogglePlayerView(bool firstPersonView)
+    {
+        if (firstPersonView)
+        {
+            cameraT.localPosition = firstPosition;
+            // cameraT.Rotate(firstRotation);
+            cameraT.localRotation = Quaternion.Euler(firstRotation);
+        }
+        else
+        {
+            cameraT.localPosition = thirdPosition;
+            // cameraT.Rotate(thirdRotation);
+            cameraT.localRotation = Quaternion.Euler(thirdRotation);
         }
     }
 }
