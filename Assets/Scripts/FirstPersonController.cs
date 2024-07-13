@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class FirstPersonController : MonoBehaviour
 {
@@ -15,8 +16,12 @@ public class FirstPersonController : MonoBehaviour
     Transform cameraT;
     float verticalLookRotation;
 
+    Vector3 moveDir;
     Vector3 moveAmount;
     Vector3 smoothMoveVelocity;
+
+    float rotateX = 0f;
+    float rotateY = 0f;
 
     bool grounded;
 
@@ -29,22 +34,13 @@ public class FirstPersonController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.Rotate(Vector3.up * Input.GetAxis("Mouse X") * Time.deltaTime * mouseSensitivityX);
-        verticalLookRotation += Input.GetAxis("Mouse Y") * Time.deltaTime * mouseSensitivityY;
+        transform.Rotate(Vector3.up * rotateX * Time.deltaTime * mouseSensitivityX);
+        verticalLookRotation += rotateY * Time.deltaTime * mouseSensitivityY;
         verticalLookRotation = Mathf.Clamp(verticalLookRotation, -40, 40);
         cameraT.localEulerAngles = Vector3.left * verticalLookRotation;
 
-        Vector3 moveDir = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
         Vector3 targetMoveAmount = moveDir * walkSpeed;
         moveAmount = Vector3.SmoothDamp(moveAmount, targetMoveAmount, ref smoothMoveVelocity, 0.15f);
-
-        if (Input.GetButtonDown("Jump"))
-        {
-            if (grounded)
-            {
-                GetComponent<Rigidbody>().AddForce(transform.up * jumpForce);
-            }
-        }
 
         grounded = false;
         Ray ray = new Ray(transform.position, -transform.up);
@@ -59,5 +55,32 @@ public class FirstPersonController : MonoBehaviour
     void FixedUpdate()
     {
         GetComponent<Rigidbody>().MovePosition(GetComponent<Rigidbody>().position + transform.TransformDirection(moveAmount) * Time.fixedDeltaTime);
+    }
+
+    private void OnMove(InputValue movementValue)
+    {
+        Vector2 movementVector = movementValue.Get<Vector2>();
+
+        float xMove = movementVector.x;
+        float zMove = movementVector.y;
+
+        moveDir = new Vector3(xMove, 0, zMove).normalized;
+    }
+
+    private void OnRotate(InputValue rotateValue)
+    {
+        rotateX = rotateValue.Get<Vector2>().x;
+        rotateY = rotateValue.Get<Vector2>().y;
+    }
+
+    private void OnJump(InputValue jumpValue)
+    {
+        if (jumpValue.Get<float>() > 0)
+        {
+            if (grounded)
+            {
+                GetComponent<Rigidbody>().AddForce(transform.up * jumpForce);
+            }
+        }
     }
 }
