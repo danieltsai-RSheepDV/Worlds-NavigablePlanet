@@ -3,7 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class FirstPersonController : MonoBehaviour
+/*
+ * Modified from Sebastian Lague's First Person Controller: Spherical Worlds tutorial
+ * Link: https://www.youtube.com/watch?v=TicipSVT-T8&t=1s
+ */
+
+public class PlayerController : MonoBehaviour
 {
     private bool m_firstPerson = true;
     public bool firstPerson
