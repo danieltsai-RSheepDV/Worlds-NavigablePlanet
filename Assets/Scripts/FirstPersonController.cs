@@ -56,9 +56,9 @@ public class FirstPersonController : MonoBehaviour
     void Update()
     {
         // camera rotation
-        if (false)
+        transform.Rotate(Vector3.up * rotateX * Time.deltaTime * mouseSensitivityX);
+        if (firstPerson)
         {
-            transform.Rotate(Vector3.up * rotateX * Time.deltaTime * mouseSensitivityX);
             verticalLookRotation += rotateY * Time.deltaTime * mouseSensitivityY;
             verticalLookRotation = Mathf.Clamp(verticalLookRotation, -40, 40);
             cameraT.localEulerAngles = Vector3.left * verticalLookRotation;
@@ -123,13 +123,11 @@ public class FirstPersonController : MonoBehaviour
         if (firstPersonView)
         {
             cameraT.localPosition = firstPosition;
-            // cameraT.Rotate(firstRotation);
             cameraT.localRotation = Quaternion.Euler(firstRotation);
         }
         else
         {
             cameraT.localPosition = thirdPosition;
-            // cameraT.Rotate(thirdRotation);
             cameraT.localRotation = Quaternion.Euler(thirdRotation);
         }
     }

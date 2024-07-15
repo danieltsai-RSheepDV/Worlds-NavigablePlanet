@@ -601,8 +601,8 @@ MonoBehaviour:
     m_Bits: 256
   firstPosition: {x: 0, y: 0.4, z: 0}
   firstRotation: {x: 0, y: 0, z: 0}
-  thirdPosition: {x: 0, y: 8, z: 0}
-  thirdRotation: {x: 90, y: 0, z: 0}
+  thirdPosition: {x: 0, y: 7, z: -4}
+  thirdRotation: {x: 60, y: 0, z: 0}
 --- !u!114 &1476254324
 MonoBehaviour:
   m_ObjectHideFlags: 0
