@@ -87,7 +87,8 @@ public class PlayerController : MonoBehaviour
     void FixedUpdate()
     {
         // player movement
-        GetComponent<Rigidbody>().MovePosition(GetComponent<Rigidbody>().position + transform.TransformDirection(moveAmount) * Time.fixedDeltaTime);
+        // GetComponent<Rigidbody>().MovePosition(GetComponent<Rigidbody>().position + transform.TransformDirection(moveAmount) * Time.fixedDeltaTime);
+        transform.position += (transform.TransformDirection(moveDir) * Time.deltaTime);
     }
 
     private void OnMove(InputValue movementValue)
