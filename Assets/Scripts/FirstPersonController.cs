@@ -88,7 +88,7 @@ public class PlayerController : MonoBehaviour
     {
         // player movement
         // GetComponent<Rigidbody>().MovePosition(GetComponent<Rigidbody>().position + transform.TransformDirection(moveAmount) * Time.fixedDeltaTime);
-        transform.position += (transform.TransformDirection(moveDir) * Time.deltaTime);
+        transform.position += (transform.TransformDirection(moveDir) * walkSpeed * Time.deltaTime);
     }
 
     private void OnMove(InputValue movementValue)

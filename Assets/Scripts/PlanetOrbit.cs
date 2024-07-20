@@ -20,6 +20,14 @@ public class PlanetOrbit : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        // rotate around sun
         transform.Rotate(new Vector3(0, circumferenceDivSpeed * Time.deltaTime, 0));
+
+        // rotate around its own axis
+        Transform child = transform.GetChild(0);
+        Vector3 translate = child.TransformPoint(Vector3.zero);
+        child.Translate(-translate, Space.World);
+        child.Rotate(new Vector3(0, circumferenceDivSpeed * Time.deltaTime, 0));
+        child.Translate(translate, Space.World);
     }
 }
