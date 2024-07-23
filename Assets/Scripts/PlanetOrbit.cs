@@ -13,7 +13,11 @@ public class PlanetOrbit : MonoBehaviour
     void Start()
     {
         transform.rotation = Quaternion.Euler(Vector3.zero);
-        transform.GetChild(0).localPosition = new Vector3(0, 0, orbitRadius);
+        foreach (Transform child in transform)
+        {
+            child.localPosition = new Vector3(0, 0, orbitRadius);
+        }
+        // transform.GetChild(0).localPosition = new Vector3(0, 0, orbitRadius);
         circumferenceDivSpeed = 360 / orbitTime;
     }
 
@@ -23,7 +27,7 @@ public class PlanetOrbit : MonoBehaviour
         // rotate around sun
         transform.Rotate(new Vector3(0, circumferenceDivSpeed * Time.deltaTime, 0));
 
-        // rotate around its own axis
+        // rotate planet around its own axis
         Transform child = transform.GetChild(0);
         Vector3 translate = child.TransformPoint(Vector3.zero);
         child.Translate(-translate, Space.World);
