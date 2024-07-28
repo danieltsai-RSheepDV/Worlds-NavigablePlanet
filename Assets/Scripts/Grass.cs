@@ -7,7 +7,6 @@ public class Grass : MonoBehaviour
     public Material[] materials;
     public Transform player;
     Vector3 position;
-    public Transform playerHead;
     Vector3 headPosition;
 
     // Start is called before the first frame update
@@ -26,8 +25,8 @@ public class Grass : MonoBehaviour
     {
         while (true)
         {
-            position = player.transform.position;
-            headPosition = player.transform.position + new Vector3(0, 2, 0);
+            position = player.transform.position + player.transform.up;
+            headPosition = player.transform.position + (player.transform.up * 2.5f);
             int length = materials.Length;
             for (int i = 0; i < length; i++)
             {
