@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PlanetOrbit : MonoBehaviour
 {
+    [SerializeField] private Vector3 orbitCenter = Vector3.zero;
     [SerializeField] private float orbitRadius;
     [SerializeField] private float orbitTime;
 
@@ -13,11 +14,11 @@ public class PlanetOrbit : MonoBehaviour
     void Start()
     {
         transform.rotation = Quaternion.Euler(Vector3.zero);
+        transform.position = orbitCenter;
         foreach (Transform child in transform)
         {
             child.localPosition = new Vector3(0, 0, orbitRadius);
         }
-        // transform.GetChild(0).localPosition = new Vector3(0, 0, orbitRadius);
         circumferenceDivSpeed = 360 / orbitTime;
     }
 
@@ -28,10 +29,14 @@ public class PlanetOrbit : MonoBehaviour
         transform.Rotate(new Vector3(0, circumferenceDivSpeed * Time.deltaTime, 0));
 
         // rotate planet around its own axis
-        Transform child = transform.GetChild(0);
-        Vector3 translate = child.TransformPoint(Vector3.zero);
-        child.Translate(-translate, Space.World);
-        child.Rotate(new Vector3(0, circumferenceDivSpeed * Time.deltaTime, 0));
-        child.Translate(translate, Space.World);
+        foreach (Transform child in transform)
+        {
+            if (child.tag != "SpinOwnAxis")
+                continue;
+            Vector3 translate = child.TransformPoint(Vector3.zero);
+            child.Translate(-translate, Space.World);
+            child.Rotate(new Vector3(0, circumferenceDivSpeed * Time.deltaTime, 0));
+            child.Translate(translate, Space.World);
+        }
     }
 }

@@ -2,6 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * Based on KAY B 14's Unity 3D interactive grass shader graph (high performance method) tutorial
+ * Link: https://www.youtube.com/watch?v=zm7rKXEPa9M
+ */
+
 public class Grass : MonoBehaviour
 {
     public Material[] materials;
