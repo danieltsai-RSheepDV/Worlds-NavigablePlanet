@@ -33,10 +33,7 @@ public class PlanetOrbit : MonoBehaviour
         {
             if (child.tag != "SpinOwnAxis")
                 continue;
-            Vector3 translate = child.TransformPoint(Vector3.zero);
-            child.Translate(-translate, Space.World);
             child.Rotate(new Vector3(0, circumferenceDivSpeed * Time.deltaTime, 0));
-            child.Translate(translate, Space.World);
         }
     }
 }
