@@ -51,10 +51,13 @@ public class PlayerController : MonoBehaviour
 
     bool grounded;
 
+    HungerDigestionManager hungerDigestionManager;
+
     // Start is called before the first frame update
     void Start()
     {
         cameraT = Camera.main.transform;
+        hungerDigestionManager = GetComponent<HungerDigestionManager>();
     }
 
     // Update is called once per frame
@@ -72,6 +75,10 @@ public class PlayerController : MonoBehaviour
         // player movement
         Vector3 targetMoveAmount = moveDir * walkSpeed;
         moveAmount = Vector3.SmoothDamp(moveAmount, targetMoveAmount, ref smoothMoveVelocity, 0.15f);
+
+        // if player moving, increase hunger
+        if (moveDir != Vector3.zero)
+            hungerDigestionManager.IncreaseHunger(HungerDigestionManager.RATE_TYPE.MOVE);
 
         // is player touching ground
         grounded = false;
@@ -114,6 +121,7 @@ public class PlayerController : MonoBehaviour
             if (grounded)
             {
                 GetComponent<Rigidbody>().AddForce(transform.up * jumpForce);
+                hungerDigestionManager.IncreaseHunger(HungerDigestionManager.RATE_TYPE.JUMP);
             }
         }
     }
