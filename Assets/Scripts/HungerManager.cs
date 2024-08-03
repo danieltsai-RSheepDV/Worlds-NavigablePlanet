@@ -8,12 +8,29 @@ public class HungerDigestionManager : MonoBehaviour
 {
     private enum HUNGER_STAGE
     {
-        FULL,
-        SATISFIED,
         HUNGRY,
-        STARVING
+        SATISFIED,
+        FULL
     }
-    private HUNGER_STAGE stage;
+    private HUNGER_STAGE m_stage;
+    private HUNGER_STAGE stage
+    {
+        get
+        {
+            return m_stage;
+        }
+        set
+        {
+            if (value == m_stage)
+                return;
+
+            m_stage = value;
+            sliderFillImage.color = hungerColor[(int)m_stage];
+            gameObject.GetComponent<PlayerController>().walkSpeed = walkSpeeds[(int)m_stage];
+        }
+    }
+    private Color[] hungerColor = { Color.red, Color.yellow, Color.green };
+    private float[] walkSpeeds;
 
     [SerializeField] private float maxFull = 100;
 
@@ -35,7 +52,12 @@ public class HungerDigestionManager : MonoBehaviour
             else if (value < 0)
                 m_fullMeter = 0;
 
-            hungerSlider.value = fullMeter;
+            if (m_fullMeter == maxFull)
+                stage = HUNGER_STAGE.FULL;
+            else
+                stage = (HUNGER_STAGE) Mathf.FloorToInt((m_fullMeter / maxFull) * 3);
+
+            hungerSlider.value = m_fullMeter;
         }
     }
 
@@ -48,12 +70,19 @@ public class HungerDigestionManager : MonoBehaviour
     [SerializeField] private float jumpRate = 5f;
 
     [SerializeField] Slider hungerSlider;
+    Image sliderFillImage;
 
-    private FoodNutrition foodInRange = null;
+    private List<FoodNutrition> foodInRange = new List<FoodNutrition>();
 
     // Start is called before the first frame update
     void Start()
     {
+        float curWalkSpeed = gameObject.GetComponent<PlayerController>().walkSpeed;
+        walkSpeeds = new float[] { curWalkSpeed / 2, curWalkSpeed * (3f / 4), curWalkSpeed };
+
+        sliderFillImage = hungerSlider.transform.Find("Fill Area").Find("Fill").GetComponent<Image>();
+
+        stage = HUNGER_STAGE.FULL;
         fullMeter = maxFull;
 
         hungerSlider.maxValue = maxFull;
@@ -64,7 +93,7 @@ public class HungerDigestionManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(fullMeter);
+        Debug.Log(foodInRange.Count);
     }
 
     public void IncreaseHunger(RATE_TYPE type)
@@ -92,37 +121,42 @@ public class HungerDigestionManager : MonoBehaviour
         {
             if (foodInRange != null)
             {
-                fullMeter += foodInRange.GetNutritionPoints();
-                StartCoroutine(DigestAndPoop(foodInRange.gameObject));
+                int foodToEatIndex = foodInRange.Count - 1;
+                FoodNutrition foodToEat = foodInRange[foodToEatIndex];
+                foodInRange.RemoveAt(foodToEatIndex);
+                fullMeter += foodToEat.GetNutritionPoints();
+                StartCoroutine(DigestAndPoop(foodToEat.gameObject));
             }
         }
     }
 
     private void OnTriggerEnter(Collider other)
     {
+        Debug.Log(other.name);
         FoodNutrition food = other.gameObject.GetComponent<FoodNutrition>();
         if ((food != null) && food.active)
-            foodInRange = food;
+            foodInRange.Add(food);
     }
 
     private void OnTriggerExit(Collider other)
     {
+        Debug.Log(other.name);
         if (other.gameObject.GetComponent<FoodNutrition>())
-            foodInRange = null;
+            foodInRange.Remove(other.gameObject.GetComponent<FoodNutrition>());
     }
 
     IEnumerator DigestAndPoop(GameObject food)
     {
-        // TODO: don't poop in midair
-        foodInRange = null;
         food.GetComponent<FoodNutrition>().active = false;
         food.SetActive(false);
+        food.transform.parent.gameObject.SetActive(false);
 
         yield return new WaitForSeconds(5);
 
-        food.transform.position = transform.position;
-        food.transform.rotation = transform.rotation;
+        food.transform.parent.position = transform.position;
+        food.transform.parent.rotation = transform.rotation;
 
+        food.transform.parent.gameObject.SetActive(true);
         food.SetActive(true);
         food.GetComponent<FoodNutrition>().active = true;
     }
