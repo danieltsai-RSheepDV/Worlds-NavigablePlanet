@@ -6,27 +6,27 @@ using UnityEngine.InputSystem;
 
 public class HungerDigestionManager : MonoBehaviour
 {
-    private enum HUNGER_STAGE
+    public enum HUNGER_STAGE
     {
         HUNGRY,
         SATISFIED,
         FULL
     }
     private HUNGER_STAGE m_stage;
-    private HUNGER_STAGE stage
+    public HUNGER_STAGE stage
     {
         get
         {
             return m_stage;
         }
-        set
+        private set
         {
             if (value == m_stage)
                 return;
 
             m_stage = value;
             sliderFillImage.color = hungerColor[(int)m_stage];
-            gameObject.GetComponent<PlayerController>().walkSpeed = walkSpeeds[(int)m_stage];
+            playerController.walkSpeed = walkSpeeds[(int)m_stage];
         }
     }
     private Color[] hungerColor = { Color.red, Color.yellow, Color.green };
@@ -74,10 +74,14 @@ public class HungerDigestionManager : MonoBehaviour
 
     private List<FoodNutrition> foodInRange = new List<FoodNutrition>();
 
+    private PlayerController playerController;
+
     // Start is called before the first frame update
     void Start()
     {
-        float curWalkSpeed = gameObject.GetComponent<PlayerController>().walkSpeed;
+        playerController = GetComponent<PlayerController>();
+
+        float curWalkSpeed = playerController.walkSpeed;
         walkSpeeds = new float[] { curWalkSpeed / 2, curWalkSpeed * (3f / 4), curWalkSpeed };
 
         sliderFillImage = hungerSlider.transform.Find("Fill Area").Find("Fill").GetComponent<Image>();
@@ -93,7 +97,7 @@ public class HungerDigestionManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(foodInRange.Count);
+        
     }
 
     public void IncreaseHunger(RATE_TYPE type)
@@ -132,7 +136,6 @@ public class HungerDigestionManager : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log(other.name);
         FoodNutrition food = other.gameObject.GetComponent<FoodNutrition>();
         if ((food != null) && food.active)
             foodInRange.Add(food);
@@ -140,7 +143,6 @@ public class HungerDigestionManager : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        Debug.Log(other.name);
         if (other.gameObject.GetComponent<FoodNutrition>())
             foodInRange.Remove(other.gameObject.GetComponent<FoodNutrition>());
     }

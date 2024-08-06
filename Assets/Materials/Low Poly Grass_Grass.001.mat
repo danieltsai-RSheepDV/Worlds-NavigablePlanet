@@ -101,6 +101,6 @@ Material:
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _PlayerHeadPosition: {r: -174.46373, g: 77.95912, b: 464.1139, a: 0}
-    - _PlayerPosition: {r: -174.75482, g: 76.48794, b: 464.08417, a: 0}
+    - _PlayerHeadPosition: {r: -502.87823, g: 79.12158, b: -68.8165, a: 0}
+    - _PlayerPosition: {r: -502.73444, g: 77.628494, b: -68.81782, a: 0}
   m_BuildTextureStacks: []

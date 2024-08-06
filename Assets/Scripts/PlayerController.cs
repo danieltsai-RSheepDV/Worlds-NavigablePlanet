@@ -120,6 +120,9 @@ public class PlayerController : MonoBehaviour
         {
             if (grounded)
             {
+                if (hungerDigestionManager.stage == HungerDigestionManager.HUNGER_STAGE.HUNGRY)
+                    return;
+
                 GetComponent<Rigidbody>().AddForce(transform.up * jumpForce);
                 hungerDigestionManager.IncreaseHunger(HungerDigestionManager.RATE_TYPE.JUMP);
             }
