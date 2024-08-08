@@ -88,8 +88,8 @@ Material:
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _PlayerHeadPosition: {r: 467.1244, g: 44.054554, b: 11.205112, a: 0}
-    - _PlayerPosition: {r: 467.71228, g: 43.212658, b: 10.111677, a: 0}
+    - _PlayerHeadPosition: {r: -562.7721, g: 44.845646, b: -8.184506, a: 0}
+    - _PlayerPosition: {r: -561.5756, g: 43.999268, b: -8.504137, a: 0}
   m_BuildTextureStacks: []
 --- !u!114 &7631799673639313135
 MonoBehaviour:
