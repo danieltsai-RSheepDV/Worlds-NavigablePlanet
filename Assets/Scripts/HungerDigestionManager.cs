@@ -72,7 +72,7 @@ public class HungerDigestionManager : MonoBehaviour
     [SerializeField] Slider hungerSlider;
     Image sliderFillImage;
 
-    private List<FoodNutrition> foodInRange = new List<FoodNutrition>();
+    private List<FoodLogic> foodInRange = new List<FoodLogic>();
 
     private PlayerController playerController;
 
@@ -123,10 +123,10 @@ public class HungerDigestionManager : MonoBehaviour
     {
         if (eatValue.Get<float>() > 0)
         {
-            if (foodInRange != null)
+            if (foodInRange.Count > 0)
             {
                 int foodToEatIndex = foodInRange.Count - 1;
-                FoodNutrition foodToEat = foodInRange[foodToEatIndex];
+                FoodLogic foodToEat = foodInRange[foodToEatIndex];
                 foodInRange.RemoveAt(foodToEatIndex);
                 fullMeter += foodToEat.GetNutritionPoints();
                 StartCoroutine(DigestAndPoop(foodToEat.gameObject));
@@ -136,30 +136,36 @@ public class HungerDigestionManager : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        FoodNutrition food = other.gameObject.GetComponent<FoodNutrition>();
+        FoodLogic food = other.gameObject.GetComponent<FoodLogic>();
         if ((food != null) && food.active)
             foodInRange.Add(food);
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.gameObject.GetComponent<FoodNutrition>())
-            foodInRange.Remove(other.gameObject.GetComponent<FoodNutrition>());
+        FoodLogic food = other.gameObject.GetComponent<FoodLogic>();
+        if (food != null)
+            foodInRange.Remove(food);
     }
 
     IEnumerator DigestAndPoop(GameObject food)
     {
-        food.GetComponent<FoodNutrition>().active = false;
+        food.GetComponent<FoodLogic>().active = false;
         food.SetActive(false);
         food.transform.parent.gameObject.SetActive(false);
 
         yield return new WaitForSeconds(5);
 
-        food.transform.parent.position = transform.position;
-        food.transform.parent.rotation = transform.rotation;
+        GameObject seed = food.GetComponent<FoodLogic>().seed;
 
-        food.transform.parent.gameObject.SetActive(true);
-        food.SetActive(true);
-        food.GetComponent<FoodNutrition>().active = true;
+        Instantiate(seed, transform.position, transform.rotation, transform.parent);
+        Destroy(food.transform.parent.gameObject);
+
+        //food.transform.parent.position = transform.position;
+        //food.transform.parent.rotation = transform.rotation;
+
+        //food.transform.parent.gameObject.SetActive(true);
+        //food.SetActive(true);
+        //food.GetComponent<FoodLogic>().active = true;
     }
 }

@@ -1,11 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
-public class FoodNutrition : MonoBehaviour
+public class FoodLogic : MonoBehaviour
 {
-    public bool active = true;
+    [NonSerialized] public bool active = true;
     public float nutritionPoints = 10f;
+
+    public GameObject seed;
 
     // Start is called before the first frame update
     void Start()
