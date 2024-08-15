@@ -53,11 +53,15 @@ public class PlayerController : MonoBehaviour
 
     HungerDigestionManager hungerDigestionManager;
 
+    private bool summonRain = false;
+    [SerializeField] GameObject rain;
+
     // Start is called before the first frame update
     void Start()
     {
         cameraT = Camera.main.transform;
         hungerDigestionManager = GetComponent<HungerDigestionManager>();
+        rain.SetActive(false);
     }
 
     // Update is called once per frame
@@ -133,6 +137,15 @@ public class PlayerController : MonoBehaviour
     {
         if (viewValue.Get<float>() > 0)
             firstPerson = !firstPerson;
+    }
+
+    private void OnRain(InputValue rainValue)
+    {
+        if (rainValue.Get<float>() > 0)
+        {
+            summonRain = !summonRain;
+            rain.SetActive(summonRain);
+        }
     }
 
     private void TogglePlayerView(bool firstPersonView)

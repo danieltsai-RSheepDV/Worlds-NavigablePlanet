@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlantStatsManager : MonoBehaviour
 {
+    private float rayMaxDistance = 200f;
+
     private float m_sunlightScore;
     [SerializeField] private float sunlightMax = 50f;
     [SerializeField] private float sunlightIncreaseFactor = 5f;
@@ -26,6 +28,28 @@ public class PlantStatsManager : MonoBehaviour
         }
     }
 
+    private float m_waterScore;
+    [SerializeField] private float waterMax = 50f;
+    [SerializeField] private float waterIncreaseFactor = 5f;
+    private float waterScore
+    {
+        get
+        {
+            return m_waterScore;
+        }
+        set
+        {
+            if (value == m_waterScore)
+                return;
+
+            m_waterScore = value;
+            if (value > waterMax)
+                m_waterScore = waterMax;
+            else if (value < 0)
+                m_waterScore = 0;
+        }
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -40,14 +64,21 @@ public class PlantStatsManager : MonoBehaviour
 
     void FixedUpdate()
     {
-        RaycastHit hit;
-        if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit))
+        RaycastHit[] hits;
+        hits = Physics.RaycastAll(transform.position, transform.TransformDirection(Vector3.forward), rayMaxDistance);
+        foreach (RaycastHit hit in hits)
         {
             Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * hit.distance, Color.yellow);
-            if (hit.collider.gameObject.name == "DayCollider")
+            string name = hit.collider.gameObject.name;
+            if (name == "DayCollider")
             {
                 sunlightScore += Time.fixedDeltaTime * sunlightIncreaseFactor;
-                Debug.Log(sunlightScore);
+                Debug.Log("Sunlight: " + sunlightScore);
+            }
+            else if (name == "Rain")
+            {
+                waterScore += Time.fixedDeltaTime * waterIncreaseFactor;
+                Debug.Log("Water: " + waterScore);
             }
         }
     }
