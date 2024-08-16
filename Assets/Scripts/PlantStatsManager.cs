@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlantStatsManager : MonoBehaviour
 {
     private float rayMaxDistance = 200f;
+    private LayerMask raycastMask;
 
     private float m_sunlightScore;
     [SerializeField] private float sunlightMax = 50f;
@@ -53,7 +54,7 @@ public class PlantStatsManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        raycastMask = LayerMask.GetMask("DetectRaycast");
     }
 
     // Update is called once per frame
@@ -65,7 +66,7 @@ public class PlantStatsManager : MonoBehaviour
     void FixedUpdate()
     {
         RaycastHit[] hits;
-        hits = Physics.RaycastAll(transform.position, transform.TransformDirection(Vector3.forward), rayMaxDistance);
+        hits = Physics.RaycastAll(transform.position, transform.TransformDirection(Vector3.forward), rayMaxDistance, raycastMask);
         foreach (RaycastHit hit in hits)
         {
             Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * hit.distance, Color.yellow);
