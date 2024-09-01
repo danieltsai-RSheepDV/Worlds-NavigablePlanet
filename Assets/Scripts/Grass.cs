@@ -30,8 +30,13 @@ public class Grass : MonoBehaviour
     {
         while (true)
         {
-            position = player.transform.position + player.transform.up;
-            headPosition = player.transform.position + (player.transform.up * 2.5f);
+            // long grass
+            // position = player.transform.position + player.transform.up;
+            // headPosition = player.transform.position + (player.transform.up * 2.5f);
+
+            // short grass
+            position = player.transform.position;
+            headPosition = player.transform.position + (player.transform.up * 0.5f);
             int length = materials.Length;
             for (int i = 0; i < length; i++)
             {
