@@ -43,8 +43,8 @@ public class PlayerController : MonoBehaviour
     float verticalLookRotation;
 
     Vector3 moveDir;
-    Vector3 moveAmount;
-    Vector3 smoothMoveVelocity;
+    // Vector3 moveAmount;
+    // Vector3 smoothMoveVelocity;
 
     float rotateX = 0f;
     float rotateY = 0f;
@@ -57,7 +57,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] GameObject rain;
 
     [SerializeField] GameObject topLevelPlayerMesh;
+    [SerializeField] SkinnedMeshRenderer playerMesh;
     [SerializeField] GameObject topLevelCam;
+
+    [SerializeField] Animator playerAnimator;
 
     // Start is called before the first frame update
     void Start()
@@ -80,8 +83,9 @@ public class PlayerController : MonoBehaviour
         }
 
         // player movement
-        Vector3 targetMoveAmount = moveDir * walkSpeed;
-        moveAmount = Vector3.SmoothDamp(moveAmount, targetMoveAmount, ref smoothMoveVelocity, 0.15f);
+        // Vector3 targetMoveAmount = moveDir * walkSpeed;
+        // moveAmount = Vector3.SmoothDamp(moveAmount, targetMoveAmount, ref smoothMoveVelocity, 0.15f);
+        playerAnimator.SetFloat("speed", Vector3.Magnitude(moveDir.normalized) * walkSpeed);
 
         // rotate player model
         if (moveDir != Vector3.zero)
@@ -95,13 +99,18 @@ public class PlayerController : MonoBehaviour
             hungerDigestionManager.IncreaseHunger(HungerDigestionManager.RATE_TYPE.MOVE);
 
         // is player touching ground
-        grounded = false;
         Ray ray = new Ray(transform.position, -transform.up);
         RaycastHit hit;
 
         if (Physics.Raycast(ray, out hit, (playerHeight / 2) + 0.1f, groundedMask))
         {
             grounded = true;
+            playerAnimator.SetBool("onGround", true);
+        }
+        else
+        {
+            grounded = false;
+            playerAnimator.SetBool("onGround", false);
         }
     }
 
@@ -139,6 +148,7 @@ public class PlayerController : MonoBehaviour
                     return;
 
                 GetComponent<Rigidbody>().AddForce(transform.up * jumpForce);
+                playerAnimator.SetTrigger("Jump");
                 hungerDigestionManager.IncreaseHunger(HungerDigestionManager.RATE_TYPE.JUMP);
             }
         }
@@ -166,14 +176,14 @@ public class PlayerController : MonoBehaviour
             cameraT.localPosition = firstPosition;
             cameraT.localRotation = Quaternion.Euler(firstRotation);
 
-            topLevelPlayerMesh.GetComponentInChildren<MeshRenderer>().enabled = false;
+            playerMesh.enabled = false;
         }
         else
         {
             cameraT.localPosition = thirdPosition;
             cameraT.localRotation = Quaternion.Euler(thirdRotation);
 
-            topLevelPlayerMesh.GetComponentInChildren<MeshRenderer>().enabled = true;
+            playerMesh.enabled = true;
         }
     }
 }
