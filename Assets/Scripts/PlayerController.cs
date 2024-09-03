@@ -10,7 +10,7 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    private bool m_firstPerson = true;
+    private bool m_firstPerson;
     public bool firstPerson
     {
         get
@@ -51,24 +51,27 @@ public class PlayerController : MonoBehaviour
 
     bool grounded;
 
-    HungerDigestionManager hungerDigestionManager;
+    [SerializeField] HungerDigestionManager hungerDigestionManager;
 
     private bool summonRain = false;
     [SerializeField] GameObject rain;
+
+    [SerializeField] GameObject topLevelPlayerMesh;
+    [SerializeField] GameObject topLevelCam;
 
     // Start is called before the first frame update
     void Start()
     {
         cameraT = Camera.main.transform;
-        hungerDigestionManager = GetComponent<HungerDigestionManager>();
         rain.SetActive(false);
+        firstPerson = true;
     }
 
     // Update is called once per frame
     void Update()
     {
         // camera rotation
-        transform.Rotate(Vector3.up * rotateX * Time.deltaTime * mouseSensitivityX);
+        topLevelCam.transform.Rotate(Vector3.up * rotateX * Time.deltaTime * mouseSensitivityX);
         if (firstPerson)
         {
             verticalLookRotation += rotateY * Time.deltaTime * mouseSensitivityY;
@@ -79,6 +82,13 @@ public class PlayerController : MonoBehaviour
         // player movement
         Vector3 targetMoveAmount = moveDir * walkSpeed;
         moveAmount = Vector3.SmoothDamp(moveAmount, targetMoveAmount, ref smoothMoveVelocity, 0.15f);
+
+        // rotate player model
+        if (moveDir != Vector3.zero)
+        {
+            Vector3 targetPosition = topLevelPlayerMesh.transform.position + topLevelCam.transform.TransformDirection(moveDir);
+            topLevelPlayerMesh.transform.LookAt(targetPosition, topLevelPlayerMesh.transform.up);
+        }
 
         // if player moving, increase hunger
         if (moveDir != Vector3.zero)
@@ -99,7 +109,8 @@ public class PlayerController : MonoBehaviour
     {
         // player movement
         // GetComponent<Rigidbody>().MovePosition(GetComponent<Rigidbody>().position + transform.TransformDirection(moveAmount) * Time.fixedDeltaTime);
-        transform.position += (transform.TransformDirection(moveDir) * walkSpeed * Time.deltaTime);
+
+        transform.position += (topLevelCam.transform.TransformDirection(moveDir) * walkSpeed * Time.deltaTime);
     }
 
     private void OnMove(InputValue movementValue)
@@ -154,11 +165,15 @@ public class PlayerController : MonoBehaviour
         {
             cameraT.localPosition = firstPosition;
             cameraT.localRotation = Quaternion.Euler(firstRotation);
+
+            topLevelPlayerMesh.GetComponentInChildren<MeshRenderer>().enabled = false;
         }
         else
         {
             cameraT.localPosition = thirdPosition;
             cameraT.localRotation = Quaternion.Euler(thirdRotation);
+
+            topLevelPlayerMesh.GetComponentInChildren<MeshRenderer>().enabled = true;
         }
     }
 }

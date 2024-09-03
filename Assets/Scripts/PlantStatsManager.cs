@@ -74,12 +74,10 @@ public class PlantStatsManager : MonoBehaviour
             if (name == "DayCollider")
             {
                 sunlightScore += Time.fixedDeltaTime * sunlightIncreaseFactor;
-                Debug.Log("Sunlight: " + sunlightScore);
             }
             else if (name == "Rain")
             {
                 waterScore += Time.fixedDeltaTime * waterIncreaseFactor;
-                Debug.Log("Water: " + waterScore);
             }
         }
     }

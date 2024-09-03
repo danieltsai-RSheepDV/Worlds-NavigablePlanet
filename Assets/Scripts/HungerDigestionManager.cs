@@ -74,13 +74,13 @@ public class HungerDigestionManager : MonoBehaviour
 
     private List<FoodLogic> foodInRange = new List<FoodLogic>();
 
-    private PlayerController playerController;
+    [SerializeField] private PlayerController playerController;
+
+    [SerializeField] private Transform seedParent;
 
     // Start is called before the first frame update
     void Start()
     {
-        playerController = GetComponent<PlayerController>();
-
         float curWalkSpeed = playerController.walkSpeed;
         walkSpeeds = new float[] { curWalkSpeed / 2, curWalkSpeed * (3f / 4), curWalkSpeed };
 
@@ -158,7 +158,7 @@ public class HungerDigestionManager : MonoBehaviour
 
         GameObject seed = food.GetComponent<FoodLogic>().seed;
 
-        Instantiate(seed, transform.position, transform.rotation, transform.parent);
+        Instantiate(seed, transform.position, transform.rotation, seedParent);
         Destroy(food.transform.parent.gameObject);
 
         //food.transform.parent.position = transform.position;
