@@ -1,10 +1,6 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using Unity.Sentis;
-using Unity.Sentis.Layers;
 using UnityEngine.Assertions;
 
 public class ModelTester : MonoBehaviour
@@ -36,13 +32,15 @@ public class ModelTester : MonoBehaviour
             Debug.Log($"Webcam {i}: {devices[i].name}");
         }
         
-        webCamTexture = new WebCamTexture(devices[0].name, 800, 608);
+        webCamTexture = new WebCamTexture(devices[0].name, 608, 608);
         
         Assert.IsNotNull(webCamTexture, "Failed to initialize WebCamTexture.");
         
         webCamTexture.Play();
         
         Debug.Log("WebCamTexture initialized and started successfully.");
+
+        StartCoroutine(RunModel());
     }
 
     void Update()
@@ -51,38 +49,6 @@ public class ModelTester : MonoBehaviour
         Assert.IsTrue(webCamTexture.isPlaying);
         
         string s = WebCamTexture.devices[0].name;
-        
-        var inputTensor = TextureConverter.ToTensor(webCamTexture, MODEL_INPUT_WIDTH, MODEL_INPUT_HEIGHT, MODEL_INPUT_CHANNELS);
-        
-        // Execute the model
-        worker.Schedule(inputTensor);
-        
-        inputTensor.Dispose();
-        
-        // Process the output
-        var output = worker.PeekOutput() as Tensor<float>;
-        var chest = ProcessModelOutput(output.ReadbackAndClone());
-        float chestX = chest[0],
-            chestY = chest[1],
-            chestWidth = chest[2],
-            chestHeight = chest[3],
-            confidence = chest[4];
-        ;
-        output.Dispose();
-        if (confidence > 0.5f) // Adjust this threshold as needed
-        {
-            chestSize = 
-                (chestWidth / MODEL_INPUT_WIDTH)
-                *
-                (chestHeight / MODEL_INPUT_HEIGHT)
-                ;
-            // Debug.Log(chestSize);
-            DetectBreathing(chestSize);
-        }
-        else
-        {
-            Debug.Log("No chest detected with high confidence");
-        }
     }
 
     void OnDisable()
@@ -94,6 +60,46 @@ public class ModelTester : MonoBehaviour
             webCamTexture.Stop();
             Destroy(webCamTexture);
             webCamTexture = null;
+        }
+    }
+
+    IEnumerator RunModel()
+    {
+        while (true)
+        {
+            var inputTensor = TextureConverter.ToTensor(webCamTexture, MODEL_INPUT_WIDTH, MODEL_INPUT_HEIGHT, MODEL_INPUT_CHANNELS);
+        
+            // Execute the model
+            worker.Schedule(inputTensor);
+        
+            inputTensor.Dispose();
+        
+            // Process the output
+            var output = worker.PeekOutput() as Tensor<float>;
+            var chest = ProcessModelOutput(output.ReadbackAndClone());
+            float chestX = chest[0],
+                chestY = chest[1],
+                chestWidth = chest[2],
+                chestHeight = chest[3],
+                confidence = chest[4];
+            ;
+            output.Dispose();
+            if (confidence > 0.5f) // Adjust this threshold as needed
+            {
+                chestSize = 
+                    (chestWidth)
+                    *
+                    (chestHeight)
+                    ;
+                // Debug.Log(chestSize);
+                DetectBreathing(chestSize);
+            }
+            else
+            {
+                Debug.Log("No chest detected with high confidence");
+            }
+
+            yield return new WaitForSeconds(0.25f);
         }
     }
 
@@ -162,43 +168,14 @@ public class ModelTester : MonoBehaviour
         return chest;
     }
 
-    private float minChangeThreshold = 0.0003f; // Adjust this value as needed
+    private float minChangeThreshold = 0.01f; // Adjust this value as needed
     private bool isInhaling = false;
     private float breathingThreshold = 0.01f;
-    private float pastAverageChestSize = 0f;
-    private List<float> fHistory = new List<float>();
-    private int historyLength = 60;
-
-    private bool getAverage(float newSize, out float average)
-    {
-        average = 0f;
-        
-        fHistory.Add(newSize);
-        if (fHistory.Count < historyLength) return false;
-        
-        if (fHistory.Count > historyLength) fHistory.RemoveAt(0);
-        
-        // Sort the list
-        List<float> sorted = new List<float>(fHistory);
-        sorted.Sort();
-
-        for (int i = 0; i < sorted.Count; i++)
-        {
-            average += sorted[i];
-        }
-        average /= sorted.Count;
-        
-        return true;
-    }
+    private float pastChestSize = 0f;
 
     private void DetectBreathing(float currentChestSize)
     {
-        float relativeChestSize = currentChestSize;
-        float currentAverageChestSize;
-
-        if (!getAverage(relativeChestSize, out currentAverageChestSize)) return;
-
-        float relativeChange = (currentAverageChestSize - pastAverageChestSize) / pastAverageChestSize;
+        float relativeChange = (currentChestSize - pastChestSize) / pastChestSize;
 
         // Print breathing status
         string breathingStatus;
@@ -218,10 +195,10 @@ public class ModelTester : MonoBehaviour
         }
 
         // Log both the numerical data and the breathing status
-        // Debug.Log($"Current: {currentAverageChestSize}, Last: {pastAverageChestSize}, Relative Change: {relativeChange}, Status: {breathingStatus}");
-        Debug.Log($"Status: {breathingStatus}");
+        Debug.Log($"Current: {currentChestSize}, Last: {pastChestSize}, Relative Change: {relativeChange}, Status: {breathingStatus}");
+        // Debug.Log($"Status: {breathingStatus}");
 
-        pastAverageChestSize = currentAverageChestSize;
+        pastChestSize = currentChestSize;
     }
 
     private void PrintModelInfo(Model m)
