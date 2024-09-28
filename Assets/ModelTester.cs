@@ -91,7 +91,7 @@ public class ModelTester : MonoBehaviour
                     *
                     (chestHeight)
                     ;
-                // Debug.Log(chestSize);
+                Debug.Log(chestSize);
                 DetectBreathing(chestSize);
             }
             else
@@ -99,7 +99,7 @@ public class ModelTester : MonoBehaviour
                 Debug.Log("No chest detected with high confidence");
             }
 
-            yield return new WaitForSeconds(0.25f);
+            yield return new WaitForSeconds(0.1f);
         }
     }
 
